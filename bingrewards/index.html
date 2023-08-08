@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bing Search in iframe</title>
+</head>
+<body>
+    <iframe id="msBingFrame" src="" width="800" height="600"></iframe>
+    <!-- Automation Script -->
+    <script>
+        async function getRandomWord() {
+            try {
+                const response = await fetch('words.json');
+                const data = await response.json();
+                const words = data.data;
+                const randomIndex = Math.floor(Math.random() * words.length);
+                return words[randomIndex];
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return null;
+            }
+        }
+
+        const main = async () => {
+            const iframe = document.getElementById('msBingFrame');
+            let counter = 0;
+            let intervalId;
+
+            const func = async () => {
+                try {
+                    const searchString = await getRandomWord();
+                    if (searchString !== null) {
+                        iframe.src = `https://www.bing.com/search?q=${encodeURIComponent(searchString)}`;
+                        counter++;
+                        console.log('counter', counter);
+
+                        // Stop the interval after 35 iterations
+                        if (counter === 35) {
+                            clearInterval(intervalId);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            };
+
+            intervalId = setInterval(func, getRandomInterval());
+        };
+
+        const getRandomInterval = () => {
+            // Generate random interval between 2000 and 10000 milliseconds (2 to 10 seconds)
+            return Math.floor(Math.random() * (10000 - 2000 + 1)) + 2000;
+        };
+
+        main();
+    </script>
+</body>
+</html>
